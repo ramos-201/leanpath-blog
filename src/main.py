@@ -1,14 +1,23 @@
 from starlette.applications import Starlette
-from starlette.responses import JSONResponse
 from starlette.routing import Route
+from starlette.staticfiles import StaticFiles
+from starlette.templating import Jinja2Templates
+
+import configs
 
 
-async def homepage(request):
-    return JSONResponse({'hello': 'world'})
+templates = Jinja2Templates(directory='src/templates')
+
+
+async def index(request):
+    return templates.TemplateResponse('index.html', {'request': request})
 
 
 app = Starlette(
-    debug=True, routes=[
-        Route('/', homepage),
+    routes=[
+        Route('/', index),
     ],
+    debug=configs.DEV,
 )
+
+app.mount('/static', StaticFiles(directory='src/static'), name='static')
